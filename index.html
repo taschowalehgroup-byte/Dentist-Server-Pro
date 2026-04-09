@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DentCare Pro — Advanced Dental Management</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="frontend/css/variables.css">
+<link rel="stylesheet" href="frontend/css/layout.css">
+<link rel="stylesheet" href="frontend/css/components.css">
+<link rel="stylesheet" href="frontend/css/pages.css">
+<link rel="stylesheet" href="frontend/css/modals.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ LOGIN -->
+<!-- partial: frontend/html/pages/login.html -->
+<div id="loginScreen" class="screen active">
+  <div class="login-bg">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+    <div class="teeth-anim">
+      <svg viewBox="0 0 200 80" class="teeth-svg">
+        <g class="tooth" style="--i:0"><rect x="5"  y="20" width="22" height="50" rx="8"/></g>
+        <g class="tooth" style="--i:1"><rect x="32" y="10" width="22" height="60" rx="8"/></g>
+        <g class="tooth" style="--i:2"><rect x="59" y="5"  width="22" height="65" rx="8"/></g>
+        <g class="tooth" style="--i:3"><rect x="86" y="5"  width="22" height="65" rx="8"/></g>
+        <g class="tooth" style="--i:4"><rect x="113"y="10" width="22" height="60" rx="8"/></g>
+        <g class="tooth" style="--i:5"><rect x="140"y="20" width="22" height="50" rx="8"/></g>
+        <g class="tooth" style="--i:6"><rect x="167"y="28" width="22" height="42" rx="8"/></g>
+      </svg>
+    </div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="logo-icon">🦷</div>
+      <h1>DentCare<span>Pro</span></h1>
+      <p>Advanced Dental Management System</p>
+    </div>
+    <div class="login-form">
+      <div class="form-group">
+        <label>Username</label>
+        <select id="loginUser" class="login-select">
+          <option value="">— Select your username —</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password">
+      </div>
+      <div id="loginErr" class="login-error hidden">Invalid credentials</div>
+      <button class="btn-login" onclick="App.login()">Access System →</button>
+      <div class="forgot-pw-wrap">
+        <button class="btn-forgot" onclick="App.forgotPassword()">🔒 Forgot Password?</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ APP -->
+<div id="appScreen" class="screen">
+
+  <!-- partial: frontend/html/pages/sidebar.html -->
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">🦷</span>
+      <div>
+        <div class="brand-name">DentCare<b>Pro</b></div>
+        <div class="brand-ver">v2.0</div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sidebarAvatar">A</div>
+      <div>
+        <div class="user-name" id="sidebarName">Admin</div>
+        <div class="user-role" id="sidebarRole">Administrator</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="sidebar-label">Main</div>
+      <a class="nav-item active" data-page="dashboard" onclick="App.page('dashboard')">
+        <span class="nav-icon">⊞</span><span>Dashboard</span>
+      </a>
+      <div class="sidebar-label">Clinical</div>
+      <a class="nav-item" data-page="patients" onclick="App.page('patients')">
+        <span class="nav-icon">👤</span><span>Patients</span>
+        <span class="nav-badge" id="badgePatients">0</span>
+      </a>
+      <a class="nav-item" data-page="appointments" onclick="App.page('appointments')">
+        <span class="nav-icon">📅</span><span>Appointments</span>
+        <span class="nav-badge" id="badgeAppts">0</span>
+      </a>
+      <a class="nav-item" data-page="calendar" onclick="App.page('calendar')">
+        <span class="nav-icon">🗓️</span><span>Calendar</span>
+      </a>
+      <a class="nav-item" data-page="treatments" onclick="App.page('treatments')">
+        <span class="nav-icon">🦷</span><span>Treatments</span>
+      </a>
+      <div class="sidebar-label">Administration</div>
+      <a class="nav-item" data-page="doctors" onclick="App.page('doctors')">
+        <span class="nav-icon">⚕️</span><span>Doctors</span>
+      </a>
+      <a class="nav-item" data-page="finance" onclick="App.page('finance')">
+        <span class="nav-icon">💰</span><span>Finance</span>
+      </a>
+      <a class="nav-item" data-page="inventory" onclick="App.page('inventory')">
+        <span class="nav-icon">📦</span><span>Inventory</span>
+        <span class="nav-badge danger" id="badgeInventory">0</span>
+      </a>
+      <a class="nav-item" data-page="analytics" onclick="App.page('analytics')">
+        <span class="nav-icon">📊</span><span>Analytics</span>
+      </a>
+      <a class="nav-item admin-only" data-page="passwords" onclick="App.page('passwords')">
+        <span class="nav-icon">🔑</span><span>Passwords</span>
+      </a>
+      <a class="nav-item admin-only" data-page="messages" onclick="App.page('messages')">
+        <span class="nav-icon">✉️</span><span>Messages</span>
+        <span class="nav-badge danger" id="badgeMessages" style="display:none">0</span>
+      </a>
+      <a class="nav-item" data-page="settings" onclick="App.page('settings')">
+        <span class="nav-icon">⚙️</span><span>Settings</span>
+      </a>
+    </nav>
+    <button class="sidebar-logout" onclick="App.logout()">⬡ Logout</button>
+  </aside>
+
+  <main id="main">
+
+    <!-- partial: frontend/html/pages/topbar.html -->
+    <header id="topbar">
+      <div class="topbar-left">
+        <button class="menu-toggle" onclick="App.toggleSidebar()">☰</button>
+        <div id="pageTitle" class="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <div class="topbar-date" id="liveTime"></div>
+        <button class="btn-icon" onclick="Modals.newPatient()">+ Patient</button>
+        <button class="btn-icon accent" onclick="Modals.newAppointment()">+ Appt</button>
+      </div>
+    </header>
+
+    <!-- partial: frontend/html/pages/dashboard.html -->
+    <section id="pg-dashboard" class="page-content active">
+      <div class="dash-kpi-grid" id="dashKpiGrid"></div>
+      <div class="dash-main-grid">
+        <div class="card dash-schedule-card">
+          <div class="card-head">
+            <h3>Today's Schedule</h3>
+            <button class="btn-all" onclick="App.page('appointments')">ALL →</button>
+          </div>
+          <table class="data-table">
+            <thead><tr><th>Time</th><th>Patient</th><th>Doctor</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="dashSchedBody"></tbody>
+          </table>
+        </div>
+        <div class="card dash-quick-card">
+          <div class="card-head"><h3>Quick Actions</h3></div>
+          <div class="dash-qa-list">
+            <button class="dash-qa-btn" onclick="Modals.newPatient()"><span>👤</span>New Patient</button>
+            <button class="dash-qa-btn" onclick="Modals.newAppointment()"><span>📅</span>New Appointment</button>
+            <button class="dash-qa-btn" onclick="Modals.newTransaction()"><span>💳</span>Add Transaction</button>
+            <button class="dash-qa-btn" onclick="App.page('inventory')"><span>📦</span>Inventory</button>
+          </div>
+        </div>
+      </div>
+      <div class="card dash-revenue-card">
+        <div class="card-head"><h3>Revenue Trend (12 months)</h3></div>
+        <div class="dash-chart-wrap">
+          <canvas id="dashRevenueChart" height="120"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/patients.html -->
+    <section id="pg-patients" class="page-content">
+      <div class="page-bar">
+        <input type="search" class="search-input" id="patientSearch" placeholder="🔍  Search patients…" oninput="Pages.patients.search(this.value)">
+        <button class="btn-primary" onclick="Modals.newPatient()">+ Register Patient</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>#</th><th>Name</th><th>Phone</th><th>Age</th><th>Gender</th><th>Insurance</th><th>Registered</th><th>Actions</th></tr></thead>
+          <tbody id="patientBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/appointments.html -->
+    <section id="pg-appointments" class="page-content">
+      <div class="page-bar">
+        <div class="filter-tabs" id="apptFilters">
+          <button class="ftab active" onclick="Pages.appointments.filter('all',this)">All</button>
+          <button class="ftab" onclick="Pages.appointments.filter('scheduled',this)">Scheduled</button>
+          <button class="ftab" onclick="Pages.appointments.filter('confirmed',this)">Confirmed</button>
+          <button class="ftab" onclick="Pages.appointments.filter('completed',this)">Completed</button>
+          <button class="ftab" onclick="Pages.appointments.filter('cancelled',this)">Cancelled</button>
+        </div>
+        <button class="btn-primary" onclick="Modals.newAppointment()">+ Schedule</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Patient</th><th>Doctor</th><th>Date</th><th>Time</th><th>Treatment</th><th>Priority</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="apptBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/doctors.html -->
+    <section id="pg-doctors" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">Medical Staff</h2>
+        <button class="btn-primary" onclick="Modals.addDoctor()">+ Add Doctor</button>
+      </div>
+      <div class="doctors-grid" id="doctorsGrid"></div>
+    </section>
+
+    <!-- partial: frontend/html/pages/finance.html -->
+    <section id="pg-finance" class="page-content">
+      <div class="page-bar">
+        <div class="filter-tabs" id="finFilters">
+          <button class="ftab active" onclick="Pages.finance.filter('all',this)">All</button>
+          <button class="ftab" onclick="Pages.finance.filter('income',this)">Income</button>
+          <button class="ftab" onclick="Pages.finance.filter('expense',this)">Expense</button>
+        </div>
+        <button class="btn-primary" onclick="Modals.newTransaction()">+ Transaction</button>
+      </div>
+      <div class="finance-summary" id="financeSummary"></div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Description</th><th>Category</th><th>Type</th><th>Amount</th><th>Actions</th></tr></thead>
+          <tbody id="financeBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/inventory.html -->
+    <section id="pg-inventory" class="page-content">
+      <div class="page-bar">
+        <input type="search" class="search-input" id="invSearch" placeholder="🔍  Search inventory…" oninput="Pages.inventory.search(this.value)">
+        <button class="btn-primary" onclick="Modals.addInventory()">+ Add Item</button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Item</th><th>Category</th><th>Qty</th><th>Min Stock</th><th>Unit Price</th><th>Supplier</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="invBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/passwords.html -->
+    <section id="pg-passwords" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">User Access Management</h2>
+        <div class="info-tag">Admin Only</div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>User</th><th>Role</th><th>Password</th><th>Actions</th></tr></thead>
+          <tbody id="passwordBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/calendar.html -->
+    <section id="pg-calendar" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">Appointment Calendar</h2>
+        <button class="btn-icon accent" onclick="Modals.newAppointment()">+ New Appointment</button>
+      </div>
+      <div id="calendarWrap" class="card" style="padding:1.5rem"></div>
+    </section>
+
+    <!-- partial: frontend/html/pages/treatments.html -->
+    <section id="pg-treatments" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">Treatments</h2>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <input type="text" placeholder="🔍 Search..." oninput="TreatmentsPage.search(this.value)"
+                 style="padding:.45rem .9rem;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius-sm)">
+          <button class="btn-icon" onclick="TreatmentsPage.importFile()">⬆ Import Excel/JSON</button>
+          <button class="btn-icon" onclick="TreatmentsPage.exportExcel()">⬇ Export Excel</button>
+          <button class="btn-icon" onclick="TreatmentsPage.exportJson()">⬇ Export JSON</button>
+          <button class="btn-icon accent" onclick="TreatmentsPage._addModal()">+ Add Treatment</button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Patient</th><th>Doctor</th><th>Treatment</th><th>Tooth</th><th>Date</th><th>Diagnosis</th><th>Cost</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="treatBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/messages.html -->
+    <section id="pg-messages" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">Messages</h2>
+        <div class="info-tag">Admin Only</div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>From</th><th>Request</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="messagesBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/analytics.html -->
+    <section id="pg-analytics" class="page-content">
+      <div class="an-kpi-grid" id="anKpiGrid"></div>
+      <div class="an-top-grid">
+        <div class="card">
+          <div class="card-head"><h3>Revenue vs Expenses</h3></div>
+          <div class="an-chart-wrap"><canvas id="anRevenueChart" height="180"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>Treatment Distribution</h3></div>
+          <div class="an-donut-wrap"><canvas id="anDonutChart" height="220"></canvas></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <div class="card-head"><h3>Doctor Performance — Patients</h3></div>
+        <div class="an-chart-wrap"><canvas id="anDoctorChart" height="160"></canvas></div>
+      </div>
+      <div class="card" style="margin-top:1rem">
+        <div class="card-head"><h3>Doctor Performance — Revenue</h3></div>
+        <div class="an-chart-wrap"><canvas id="anDoctorRevChart" height="160"></canvas></div>
+      </div>
+    </section>
+
+    <!-- partial: frontend/html/pages/settings.html -->
+    <section id="pg-settings" class="page-content">
+      <div class="page-bar">
+        <h2 style="color:var(--text)">Settings</h2>
+      </div>
+      <div id="settingsWrap"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══════════════════════════════════════ MODALS ════════ -->
+<div id="modalOverlay" class="modal-overlay" onclick="Modals.close(event)">
+
+  <!-- partial: frontend/html/modals/modal-new-patient.html -->
+  <div id="modalNewPatient" class="modal" style="display:none">
+    <div class="modal-head"><h3>🦷 Register New Patient</h3><button class="close-btn" onclick="Modals.close()">×</button></div>
+    <div class="modal-body">
+      <div class="np-tabs">
+        <button class="np-tab active" onclick="Modals._npTab('info',this)">👤 Patient Info</button>
+        <button class="np-tab" onclick="Modals._npTab('xray',this)">🩻 X-Ray Upload</button>
+      </div>
+      <div id="npTabInfo" class="np-tab-panel active">
+        <div class="form-grid">
+          <div class="form-group"><label>Full Name *</label><input id="np_name" placeholder="Patient full name"></div>
+          <div class="form-group"><label>Phone *</label><input id="np_phone" placeholder="Phone number"></div>
+          <div class="form-group"><label>Date of Birth</label><input id="np_dob" type="date"></div>
+          <div class="form-group"><label>Gender</label><select id="np_gender"><option value="">Select</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option></select></div>
+          <div class="form-group"><label>Email</label><input id="np_email" type="email" placeholder="Email address"></div>
+          <div class="form-group"><label>Occupation</label><input id="np_occupation" placeholder="Job title"></div>
+          <div class="form-group"><label>Blood Type</label><select id="np_blood"><option value="">Unknown</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>O+</option><option>O-</option></select></div>
+          <div class="form-group"><label>Insurance</label><input id="np_insurance" placeholder="Insurance provider"></div>
+          <div class="form-group"><label>Referral Source</label><select id="np_ref"><option value="">Select</option><option>Google</option><option>Social Media</option><option>Friend/Family</option><option>Doctor Referral</option><option>Walk-in</option></select></div>
+          <div class="form-group"><label>Payment Method</label><select id="np_pay"><option value="cash">Cash</option><option value="card">Card</option><option value="insurance">Insurance</option><option value="installment">Installment</option></select></div>
+          <div class="form-group full"><label>Medical Conditions</label><input id="np_conditions" placeholder="e.g. Diabetes, Hypertension"></div>
+          <div class="form-group full"><label>Allergies</label><input id="np_allergies" placeholder="e.g. Penicillin, Latex"></div>
+          <div class="form-group full"><label>Dental Concerns</label><input id="np_concerns" placeholder="Main dental concerns"></div>
+          <div class="form-group full"><label>Address</label><input id="np_address" placeholder="Home address"></div>
+        </div>
+      </div>
+      <div id="npTabXray" class="np-tab-panel" style="display:none">
+        <div class="xray-upload-area" id="xrayDropZone"
+             onclick="document.getElementById('xrayFileInp').click()"
+             ondragover="event.preventDefault();this.classList.add('drag-over')"
+             ondragleave="this.classList.remove('drag-over')"
+             ondrop="event.preventDefault();this.classList.remove('drag-over');Modals._handleXrayDrop(event)">
+          <div id="xrayPreviewWrap" style="display:none">
+            <img id="xrayPreviewImg" style="max-width:100%;max-height:320px;border-radius:8px;object-fit:contain">
+            <div class="xray-remove-btn" onclick="event.stopPropagation();Modals._clearXray()">✕ Remove</div>
+          </div>
+          <div id="xrayUploadPrompt">
+            <div style="font-size:3rem">🩻</div>
+            <p style="color:var(--text2);margin:.5rem 0">Click or drag &amp; drop X-ray image here</p>
+            <small style="color:var(--text-muted,var(--text2))">Supports JPG, PNG, WEBP — saved to patients.json</small>
+          </div>
+        </div>
+        <input type="file" id="xrayFileInp" accept="image/*" style="display:none" onchange="Modals._handleXrayFile(this)">
+        <div class="form-grid" style="margin-top:1rem">
+          <div class="form-group"><label>X-Ray Date</label><input type="date" id="np_xray_date" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="form-group"><label>X-Ray Notes</label><input type="text" id="np_xray_notes" placeholder="e.g. Panoramic, Bitewing..."></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="Modals.close()">Cancel</button>
+      <button class="btn-primary" onclick="Actions.registerPatient()">✓ Register Patient</button>
+    </div>
+  </div>
+
+  <!-- partial: frontend/html/modals/modal-new-appointment.html -->
+  <div id="modalNewAppt" class="modal" style="display:none">
+    <div class="modal-head"><h3>📅 Schedule Appointment</h3><button class="close-btn" onclick="Modals.close()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Patient *</label><select id="ap_patient"><option value="">Select patient…</option></select></div>
+        <div class="form-group full"><label>Doctor *</label><select id="ap_doctor"><option value="">Select doctor…</option></select></div>
+        <div class="form-group"><label>Date *</label><input id="ap_date" type="date"></div>
+        <div class="form-group"><label>Time *</label><input id="ap_time" type="time"></div>
+        <div class="form-group"><label>Duration</label><select id="ap_dur"><option value="15">15 min</option><option value="30" selected>30 min</option><option value="45">45 min</option><option value="60">1 hour</option><option value="90">1.5 hours</option><option value="120">2 hours</option></select></div>
+        <div class="form-group"><label>Priority</label><select id="ap_priority"><option value="normal">Normal</option><option value="urgent">Urgent</option><option value="emergency">Emergency</option></select></div>
+        <div class="form-group full"><label>Treatment Type</label><select id="ap_type"><option value="">Select type…</option><option>General Checkup</option><option>Cleaning/Scaling</option><option>Filling</option><option>Root Canal</option><option>Extraction</option><option>Crown/Bridge</option><option>Implant</option><option>Orthodontics</option><option>Cosmetic</option><option>Emergency</option></select></div>
+        <div class="form-group full"><label>Chief Complaint</label><input id="ap_complaint" placeholder="Main reason for visit"></div>
+        <div class="form-group full"><label>Notes</label><input id="ap_notes" placeholder="Additional notes"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="Modals.close()">Cancel</button>
+      <button class="btn-primary" onclick="Actions.scheduleAppt()">✓ Schedule</button>
+    </div>
+  </div>
+
+  <!-- partial: frontend/html/modals/modal-add-doctor.html -->
+  <div id="modalAddDoctor" class="modal" style="display:none">
+    <div class="modal-head"><h3>⚕️ Add Doctor</h3><button class="close-btn" onclick="Modals.close()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Full Name *</label><input id="dr_name" placeholder="Dr. Full Name"></div>
+        <div class="form-group full"><label>Specialty *</label><select id="dr_spec"><option value="">Select…</option><option>General Dentistry</option><option>Orthodontics</option><option>Endodontics</option><option>Periodontics</option><option>Oral Surgery</option><option>Prosthodontics</option><option>Pediatric Dentistry</option></select></div>
+        <div class="form-group"><label>Phone</label><input id="dr_phone" placeholder="Phone number"></div>
+        <div class="form-group"><label>Email</label><input id="dr_email" type="email" placeholder="Email"></div>
+        <div class="form-group"><label>License #</label><input id="dr_lic" placeholder="License number"></div>
+        <div class="form-group"><label>Room</label><input id="dr_room" placeholder="e.g. Room 3"></div>
+        <div class="form-group full"><label>Schedule</label><input id="dr_sched" placeholder="e.g. Sun-Thu 9AM-5PM"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="Modals.close()">Cancel</button>
+      <button class="btn-primary" onclick="Actions.addDoctor()">✓ Add Doctor</button>
+    </div>
+  </div>
+
+  <!-- partial: frontend/html/modals/modal-new-transaction.html -->
+  <div id="modalNewTx" class="modal modal-sm" style="display:none">
+    <div class="modal-head"><h3>💰 Add Transaction</h3><button class="close-btn" onclick="Modals.close()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Description *</label><input id="tx_desc" placeholder="Transaction description"></div>
+        <div class="form-group"><label>Type *</label><select id="tx_type"><option value="income">Income</option><option value="expense">Expense</option></select></div>
+        <div class="form-group"><label>Category</label><select id="tx_cat"><option>Treatment</option><option>Consultation</option><option>Supplies</option><option>Equipment</option><option>Salary</option><option>Rent</option><option>Utilities</option><option>Other</option></select></div>
+        <div class="form-group"><label>Amount (E£) *</label><input id="tx_amount" type="number" placeholder="0.00"></div>
+        <div class="form-group"><label>Date *</label><input id="tx_date" type="date"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="Modals.close()">Cancel</button>
+      <button class="btn-primary" onclick="Actions.addTransaction()">✓ Add Transaction</button>
+    </div>
+  </div>
+
+  <!-- partial: frontend/html/modals/modal-add-inventory.html -->
+  <div id="modalAddInv" class="modal modal-sm" style="display:none">
+    <div class="modal-head"><h3>📦 Add Inventory Item</h3><button class="close-btn" onclick="Modals.close()">×</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="form-group full"><label>Item Name *</label><input id="inv_name" placeholder="Item name"></div>
+        <div class="form-group full"><label>Category</label><select id="inv_cat"><option value="consumable">Consumable</option><option value="equipment">Equipment</option><option value="medication">Medication</option><option value="material">Material</option></select></div>
+        <div class="form-group"><label>Quantity *</label><input id="inv_qty" type="number" placeholder="0"></div>
+        <div class="form-group"><label>Min Stock Level</label><input id="inv_min" type="number" placeholder="5"></div>
+        <div class="form-group"><label>Unit Price (E£)</label><input id="inv_price" type="number" placeholder="0.00"></div>
+        <div class="form-group"><label>Supplier</label><input id="inv_supplier" placeholder="Supplier name"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ghost" onclick="Modals.close()">Cancel</button>
+      <button class="btn-primary" onclick="Actions.addInventoryItem()">✓ Add Item</button>
+    </div>
+  </div>
+
+  <!-- partial: frontend/html/modals/modal-patient-detail.html -->
+  <div id="modalPatientDetail" class="modal modal-xl" style="display:none">
+    <div class="modal-head">
+      <h3 id="detailPatientName">Patient Details</h3>
+      <button class="close-btn" onclick="Modals.close()">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="detail-tabs">
+        <button class="dtab active" onclick="UI.detailTab('overview',this)">Overview</button>
+        <button class="dtab" onclick="UI.detailTab('treatments',this)">Treatments</button>
+        <button class="dtab" onclick="UI.detailTab('appointments',this)">Appointments</button>
+        <button class="dtab" onclick="UI.detailTab('billing',this)">Billing</button>
+        <button class="dtab" onclick="UI.detailTab('xray',this)">🩻 X-Ray</button>
+      </div>
+      <div id="detailOverview" class="detail-panel active"></div>
+      <div id="detailTreatments" class="detail-panel"></div>
+      <div id="detailAppointments" class="detail-panel"></div>
+      <div id="detailBilling" class="detail-panel"></div>
+      <div id="detailXray" class="detail-panel"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- TOAST -->
+<div id="toastContainer" class="toast-container"></div>
+
+<!-- ═══════════ JS Modules (load order matters) ═══════════ -->
+<script src="backend/public/js/api.js"></script>
+<script src="backend/public/js/ui.js"></script>
+<script src="backend/public/js/pages/dashboard.js"></script>
+<script src="backend/public/js/pages/patients.js"></script>
+<script src="backend/public/js/pages/appointments.js"></script>
+<script src="backend/public/js/pages/doctors.js"></script>
+<script src="backend/public/js/pages/finance.js"></script>
+<script src="backend/public/js/pages/inventory.js"></script>
+<script src="backend/public/js/pages/passwords.js"></script>
+<script src="backend/public/js/pages/messages.js"></script>
+<script src="backend/public/js/pages/calendar.js"></script>
+<script src="backend/public/js/pages/treatments.js"></script>
+<script src="backend/public/js/pages/settings.js"></script>
+<script src="backend/public/js/pages/analytics.js"></script>
+<script src="backend/public/js/modals.js"></script>
+<script src="backend/public/js/actions.js"></script>
+<script src="backend/public/js/app.js"></script>
+</body>
+</html>
